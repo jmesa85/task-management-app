@@ -1,4 +1,4 @@
-import { Component, OnInit, Signal, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, Signal, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -9,7 +9,8 @@ import { TaskService } from '../../services/task.service';
   selector: 'app-task-detail',
   imports: [RouterLink, DatePipe],
   templateUrl: './task-detail.component.html',
-  styleUrl: './task-detail.component.scss'
+  styleUrl: './task-detail.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

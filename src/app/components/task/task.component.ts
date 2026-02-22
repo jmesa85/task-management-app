@@ -1,4 +1,4 @@
-import { Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Task } from '../../models/task.model';
@@ -7,7 +7,8 @@ import { Task } from '../../models/task.model';
   selector: 'app-task',
   imports: [DatePipe, RouterLink],
   templateUrl: './task.component.html',
-  styleUrl: './task.component.scss'
+  styleUrl: './task.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskComponent {
   task = input.required<Task>();

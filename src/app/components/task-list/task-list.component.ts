@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, Signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TaskComponent } from '../task/task.component';
@@ -10,7 +10,8 @@ import { TaskService } from '../../services/task.service';
   selector: 'app-task-list',
   imports: [TaskComponent, TaskStateFormComponent, RouterLink],
   templateUrl: './task-list.component.html',
-  styleUrl: './task-list.component.scss'
+  styleUrl: './task-list.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskListComponent {
   private readonly taskService = inject(TaskService);

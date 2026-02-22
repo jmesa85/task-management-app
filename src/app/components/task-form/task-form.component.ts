@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Task, TaskState } from '../../models/task.model';
@@ -8,7 +8,8 @@ import { TaskService } from '../../services/task.service';
   selector: 'app-task-form',
   imports: [ReactiveFormsModule],
   templateUrl: './task-form.component.html',
-  styleUrl: './task-form.component.scss'
+  styleUrl: './task-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskFormComponent {
   private readonly fb = inject(FormBuilder);

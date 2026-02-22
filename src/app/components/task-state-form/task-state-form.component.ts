@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { Task, TaskState } from '../../models/task.model';
@@ -8,7 +8,8 @@ import { TaskService } from '../../services/task.service';
   selector: 'app-task-state-form',
   imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './task-state-form.component.html',
-  styleUrl: './task-state-form.component.scss'
+  styleUrl: './task-state-form.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskStateFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
