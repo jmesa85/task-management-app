@@ -11,7 +11,7 @@ describe('TaskListComponent', () => {
 
   const mockTasks: Task[] = [
     {
-      id: 1,
+      id: '1',
       title: 'Task 1',
       description: 'Description 1',
       dueDate: '2024-01-15',
@@ -20,7 +20,7 @@ describe('TaskListComponent', () => {
       notes: []
     },
     {
-      id: 2,
+      id: '2',
       title: 'Task 2',
       description: 'Description 2',
       dueDate: '2024-01-20',
@@ -131,7 +131,7 @@ describe('TaskListComponent', () => {
     component.onToggleComplete(task);
 
     expect(taskServiceSpy.updateTask).toHaveBeenCalledWith(updatedTask);
-    expect(component.tasks().find(t => t.id === 1)?.completed).toBeTrue();
+    expect(component.tasks().find(t => t.id === '1')?.completed).toBeTrue();
   });
 
   it('should show empty state when no tasks', () => {

@@ -10,7 +10,7 @@ describe('TaskFormComponent', () => {
   let taskServiceSpy: jasmine.SpyObj<TaskService>;
 
   const mockCreatedTask: Task = {
-    id: 10,
+    id: '10',
     title: 'New Task',
     description: 'A description',
     dueDate: '2024-06-01',

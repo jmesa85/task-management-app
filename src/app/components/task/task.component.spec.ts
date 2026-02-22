@@ -7,7 +7,7 @@ describe('TaskComponent', () => {
   let fixture: ComponentFixture<TaskComponent>;
 
   const mockTask: Task = {
-    id: 1,
+    id: '1',
     title: 'Test Task',
     description: 'A task for testing',
     dueDate: '2024-01-15',
