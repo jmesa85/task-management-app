@@ -1,0 +1,92 @@
+.task-form {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  background: #fff;
+  margin-bottom: 1rem;
+
+  &__field {
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+
+    &--textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+  }
+
+  &__error {
+    display: block;
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+  }
+
+  &__note-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  &__btn {
+    padding: 0.375rem 0.875rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: opacity 0.2s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--submit {
+      background-color: #10b981;
+      color: #fff;
+    }
+
+    &--cancel {
+      background-color: #6b7280;
+      color: #fff;
+    }
+
+    &--add {
+      background-color: #3b82f6;
+      color: #fff;
+      margin-top: 0.25rem;
+    }
+
+    &--remove {
+      background-color: #ef4444;
+      color: #fff;
+      flex-shrink: 0;
+    }
+  }
+}

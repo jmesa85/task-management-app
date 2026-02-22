@@ -1,6 +1,14 @@
 <div class="task-list">
   <h2 class="task-list__title">Tasks</h2>
 
+  <button class="task-list__add-btn" (click)="toggleForm()">
+    {{ showForm() ? 'Cancel' : '+ Add Task' }}
+  </button>
+
+  @if (showForm()) {
+    <app-task-form (taskCreated)="onTaskCreated()" (cancelled)="onFormCancelled()" />
+  }
+
   @if (tasks().length === 0) {
     <p class="task-list__empty">No tasks found.</p>
   }

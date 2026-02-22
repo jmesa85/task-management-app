@@ -1,0 +1,58 @@
+<form class="task-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="task-form__field">
+    <label class="task-form__label" for="title">Title</label>
+    <input class="task-form__input" id="title" type="text" formControlName="title" />
+    @if (form.get('title')!.touched && form.get('title')!.hasError('required')) {
+      <span class="task-form__error">Title is required.</span>
+    }
+  </div>
+
+  <div class="task-form__field">
+    <label class="task-form__label" for="description">Description</label>
+    <textarea class="task-form__input task-form__input--textarea" id="description" formControlName="description"></textarea>
+    @if (form.get('description')!.touched && form.get('description')!.hasError('required')) {
+      <span class="task-form__error">Description is required.</span>
+    }
+  </div>
+
+  <div class="task-form__field">
+    <label class="task-form__label" for="dueDate">Due Date</label>
+    <input class="task-form__input" id="dueDate" type="date" formControlName="dueDate" />
+    @if (form.get('dueDate')!.touched && form.get('dueDate')!.hasError('required')) {
+      <span class="task-form__error">Due date is required.</span>
+    }
+  </div>
+
+  <div class="task-form__field">
+    <label class="task-form__label" for="state">State</label>
+    <select class="task-form__input" id="state" formControlName="state">
+      @for (state of states; track state) {
+        <option [value]="state">{{ state }}</option>
+      }
+    </select>
+    @if (form.get('state')!.touched && form.get('state')!.hasError('required')) {
+      <span class="task-form__error">State is required.</span>
+    }
+  </div>
+
+  <div class="task-form__field" formArrayName="notes">
+    <label class="task-form__label">Notes</label>
+    @for (note of notes.controls; track $index) {
+      <div class="task-form__note-row">
+        <input class="task-form__input" [formControlName]="$index" [attr.placeholder]="'Note ' + ($index + 1)" />
+        @if (notes.length > 1) {
+          <button type="button" class="task-form__btn task-form__btn--remove" (click)="removeNote($index)">Remove</button>
+        }
+      </div>
+      @if (note.touched && note.hasError('required')) {
+        <span class="task-form__error">Note is required.</span>
+      }
+    }
+    <button type="button" class="task-form__btn task-form__btn--add" (click)="addNote()">+ Add Note</button>
+  </div>
+
+  <div class="task-form__actions">
+    <button type="submit" class="task-form__btn task-form__btn--submit" [disabled]="submitting()">Create Task</button>
+    <button type="button" class="task-form__btn task-form__btn--cancel" (click)="onCancel()">Cancel</button>
+  </div>
+</form>

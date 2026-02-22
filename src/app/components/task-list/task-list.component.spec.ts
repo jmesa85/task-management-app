@@ -51,7 +51,7 @@ describe('TaskListComponent', () => {
   };
 
   beforeEach(async () => {
-    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'updateTask']);
+    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'createTask', 'updateTask']);
     taskServiceSpy.getTasks.and.returnValue(of(mockResponse));
 
     await TestBed.configureTestingModule({

@@ -1,11 +1,12 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TaskComponent } from '../task/task.component';
+import { TaskFormComponent } from '../task-form/task-form.component';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 
 @Component({
   selector: 'app-task-list',
-  imports: [TaskComponent],
+  imports: [TaskComponent, TaskFormComponent],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -13,6 +14,7 @@ export class TaskListComponent implements OnInit {
   private readonly taskService = inject(TaskService);
 
   tasks = signal<Task[]>([]);
+  showForm = signal(false);
   currentPage = signal(1);
   totalPages = signal(0);
   totalItems = signal(0);
@@ -58,6 +60,19 @@ export class TaskListComponent implements OnInit {
         tasks.map((t) => (t.id === saved.id ? saved : t))
       );
     });
+  }
+
+  toggleForm(): void {
+    this.showForm.update((v) => !v);
+  }
+
+  onTaskCreated(): void {
+    this.showForm.set(false);
+    this.loadTasks();
+  }
+
+  onFormCancelled(): void {
+    this.showForm.set(false);
   }
 
   onEdit(task: Task): void {
