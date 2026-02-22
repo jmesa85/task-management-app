@@ -12,6 +12,7 @@ export class TaskComponent {
   task = input.required<Task>();
   edit = output<Task>();
   delete = output<Task>();
+  toggleComplete = output<Task>();
 
   currentState = computed(() => {
     const history = this.task().stateHistory;

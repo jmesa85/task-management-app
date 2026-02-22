@@ -86,4 +86,35 @@ describe('TaskComponent', () => {
     btn.click();
     expect(component.delete.emit).toHaveBeenCalledWith(mockTask);
   });
+
+  it('should emit task on toggleComplete button click', () => {
+    spyOn(component.toggleComplete, 'emit');
+    const btn = fixture.nativeElement.querySelector('.task-card__btn--complete') as HTMLButtonElement;
+    btn.click();
+    expect(component.toggleComplete.emit).toHaveBeenCalledWith(mockTask);
+  });
+
+  it('should show "Mark Complete" when task is not completed', () => {
+    const btn = fixture.nativeElement.querySelector('.task-card__btn--complete') as HTMLButtonElement;
+    expect(btn.textContent?.trim()).toBe('Mark Complete');
+  });
+
+  it('should show "Mark Incomplete" when task is completed', () => {
+    fixture.componentRef.setInput('task', { ...mockTask, completed: true });
+    fixture.detectChanges();
+    const btn = fixture.nativeElement.querySelector('.task-card__btn--complete') as HTMLButtonElement;
+    expect(btn.textContent?.trim()).toBe('Mark Incomplete');
+  });
+
+  it('should apply completed class when task is completed', () => {
+    fixture.componentRef.setInput('task', { ...mockTask, completed: true });
+    fixture.detectChanges();
+    const card = fixture.nativeElement.querySelector('.task-card');
+    expect(card.classList.contains('task-card--completed')).toBeTrue();
+  });
+
+  it('should not apply completed class when task is not completed', () => {
+    const card = fixture.nativeElement.querySelector('.task-card');
+    expect(card.classList.contains('task-card--completed')).toBeFalse();
+  });
 });

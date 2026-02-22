@@ -1,6 +1,7 @@
 {
   "tasks": [
     {
+      "id": 1,
       "title": "Complete Project Proposal",
       "description": "Prepare and submit the project proposal for approval.",
       "dueDate": "2023-12-15",
@@ -15,6 +16,7 @@
       ]
     },
     {
+      "id": 2,
       "title": "Design Wireframes",
       "description": "Create wireframes for the user interface.",
       "dueDate": "2023-12-20",
@@ -29,6 +31,7 @@
       ]
     },
     {
+      "id": 3,
       "title": "Implement User Authentication",
       "description": "Develop user authentication functionality.",
       "dueDate": "2023-12-25",
@@ -43,6 +46,7 @@
       ]
     },
     {
+      "id": 4,
       "title": "Write API Documentation",
       "description": "Document the RESTful API for external developers.",
       "dueDate": "2023-12-30",
@@ -57,6 +61,7 @@
       ]
     },
     {
+      "id": 5,
       "title": "Bug Fixes and Testing",
       "description": "Address reported bugs and perform thorough testing.",
       "dueDate": "2024-01-05",
@@ -71,6 +76,7 @@
       ]
     },
     {
+      "id": 6,
       "title": "Project Deployment",
       "description": "Prepare for and deploy the project to production.",
       "dueDate": "2024-01-10",

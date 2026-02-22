@@ -1,4 +1,4 @@
-<div class="task-card">
+<div class="task-card" [class.task-card--completed]="task().completed">
   <div class="task-card__header">
     <h3 class="task-card__title">{{ task().title }}</h3>
     <span class="task-card__state-badge" [attr.data-state]="currentState()">
@@ -24,6 +24,9 @@
   }
 
   <div class="task-card__actions">
+    <button class="task-card__btn task-card__btn--complete" (click)="toggleComplete.emit(task())">
+      {{ task().completed ? 'Mark Incomplete' : 'Mark Complete' }}
+    </button>
     <button class="task-card__btn task-card__btn--edit" (click)="edit.emit(task())">Edit</button>
     <button class="task-card__btn task-card__btn--delete" (click)="delete.emit(task())">Delete</button>
   </div>

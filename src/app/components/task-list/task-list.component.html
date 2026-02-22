@@ -1,0 +1,40 @@
+<div class="task-list">
+  <h2 class="task-list__title">Tasks</h2>
+
+  @if (tasks().length === 0) {
+    <p class="task-list__empty">No tasks found.</p>
+  }
+
+  <div class="task-list__items">
+    @for (task of tasks(); track task.id) {
+      <app-task
+        [task]="task"
+        (toggleComplete)="onToggleComplete($event)"
+        (edit)="onEdit($event)"
+        (delete)="onDelete($event)"
+      />
+    }
+  </div>
+
+  @if (totalPages() > 1) {
+    <div class="task-list__pagination">
+      <button
+        class="task-list__pagination-btn"
+        [disabled]="!hasPreviousPage()"
+        (click)="previousPage()"
+      >
+        Previous
+      </button>
+      <span class="task-list__pagination-info">
+        Page {{ currentPage() }} of {{ totalPages() }}
+      </span>
+      <button
+        class="task-list__pagination-btn"
+        [disabled]="!hasNextPage()"
+        (click)="nextPage()"
+      >
+        Next
+      </button>
+    </div>
+  }
+</div>
