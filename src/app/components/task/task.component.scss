@@ -2,7 +2,7 @@
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 1.25rem;
-  max-width: 480px;
+  max-width: 100%;
   background: #fff;
   transition: opacity 0.3s, border-left-color 0.3s;
 
@@ -104,6 +104,21 @@
     &--complete {
       background-color: #10b981;
       color: #fff;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .task-card {
+    padding: 1rem;
+
+    &__actions {
+      flex-wrap: wrap;
+    }
+
+    &__btn {
+      min-height: 2.5rem;
+      padding: 0.5rem 1rem;
     }
   }
 }

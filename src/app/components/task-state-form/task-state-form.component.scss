@@ -123,3 +123,18 @@
     }
   }
 }
+
+@media (max-width: 767px) {
+  .task-state-form {
+    padding: 1rem;
+
+    &__actions {
+      flex-wrap: wrap;
+    }
+
+    &__btn {
+      min-height: 2.5rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+}

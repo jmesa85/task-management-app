@@ -1,5 +1,5 @@
 .task-list {
-  max-width: 520px;
+  max-width: 100%;
   margin: 0 auto;
 
   &__title {
@@ -76,5 +76,18 @@
   &__pagination-info {
     font-size: 0.875rem;
     color: #555;
+  }
+}
+
+@media (max-width: 767px) {
+  .task-list {
+    &__pagination {
+      gap: 0.5rem;
+    }
+
+    &__pagination-btn {
+      min-height: 2.5rem;
+      padding: 0.5rem 0.75rem;
+    }
   }
 }
