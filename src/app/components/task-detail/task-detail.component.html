@@ -1,0 +1,51 @@
+@if (task(); as task) {
+  <div class="task-detail">
+    <a class="task-detail__back" routerLink="/tasks">&larr; Back to list</a>
+
+    <div class="task-detail__header">
+      <h2 class="task-detail__title">{{ task.title }}</h2>
+      <span class="task-detail__state-badge" [attr.data-state]="currentState()">
+        {{ currentState() }}
+      </span>
+    </div>
+
+    <p class="task-detail__description">{{ task.description }}</p>
+
+    <p class="task-detail__due-date">
+      <strong>Due:</strong> {{ task.dueDate | date:'mediumDate' }}
+    </p>
+
+    <p class="task-detail__completed">
+      <strong>Status:</strong> {{ task.completed ? 'Completed' : 'Incomplete' }}
+    </p>
+
+    @if (task.stateHistory.length > 0) {
+      <div class="task-detail__history">
+        <h3 class="task-detail__section-title">State History</h3>
+        <ul class="task-detail__history-list">
+          @for (entry of task.stateHistory; track $index) {
+            <li class="task-detail__history-item">
+              <span class="task-detail__history-state" [attr.data-state]="entry.state">{{ entry.state }}</span>
+              <span class="task-detail__history-date">{{ entry.date | date:'mediumDate' }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    @if (task.notes.length > 0) {
+      <div class="task-detail__notes">
+        <h3 class="task-detail__section-title">Notes</h3>
+        <ul class="task-detail__notes-list">
+          @for (note of task.notes; track note) {
+            <li>{{ note }}</li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+} @else {
+  <div class="task-detail task-detail--loading">
+    <p>Loading task...</p>
+  </div>
+}

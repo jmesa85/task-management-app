@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, Router } from '@angular/router';
 import { TaskFormComponent } from './task-form.component';
 import { TaskService } from '../../services/task.service';
 import { of } from 'rxjs';
@@ -8,6 +9,7 @@ describe('TaskFormComponent', () => {
   let component: TaskFormComponent;
   let fixture: ComponentFixture<TaskFormComponent>;
   let taskServiceSpy: jasmine.SpyObj<TaskService>;
+  let router: Router;
 
   const mockCreatedTask: Task = {
     id: '10',
@@ -26,12 +28,15 @@ describe('TaskFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TaskFormComponent],
       providers: [
-        { provide: TaskService, useValue: taskServiceSpy }
+        { provide: TaskService, useValue: taskServiceSpy },
+        provideRouter([])
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TaskFormComponent);
     component = fixture.componentInstance;
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate');
     fixture.detectChanges();
   });
 
@@ -67,7 +72,7 @@ describe('TaskFormComponent', () => {
     expect(taskServiceSpy.createTask).not.toHaveBeenCalled();
   });
 
-  it('should call createTask and emit taskCreated on valid submit', () => {
+  it('should call createTask and navigate to /tasks on valid submit', () => {
     component.form.patchValue({
       title: 'New Task',
       description: 'A description',
@@ -76,7 +81,6 @@ describe('TaskFormComponent', () => {
     });
     component.notes.at(0).setValue('First note');
 
-    const emitSpy = spyOn(component.taskCreated, 'emit');
     component.onSubmit();
 
     expect(taskServiceSpy.createTask).toHaveBeenCalled();
@@ -88,13 +92,12 @@ describe('TaskFormComponent', () => {
     expect(callArg.stateHistory.length).toBe(1);
     expect(callArg.stateHistory[0].state).toBe('new');
     expect(callArg.notes).toEqual(['First note']);
-    expect(emitSpy).toHaveBeenCalledWith(mockCreatedTask);
+    expect(router.navigate).toHaveBeenCalledWith(['/tasks']);
   });
 
-  it('should emit cancelled on onCancel()', () => {
-    const emitSpy = spyOn(component.cancelled, 'emit');
+  it('should navigate to /tasks on onCancel()', () => {
     component.onCancel();
-    expect(emitSpy).toHaveBeenCalled();
+    expect(router.navigate).toHaveBeenCalledWith(['/tasks']);
   });
 
   it('should show validation errors when fields are touched and empty', () => {

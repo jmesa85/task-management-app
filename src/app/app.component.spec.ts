@@ -1,18 +1,12 @@
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { App } from './app.component';
-import { TaskService } from './services/task.service';
-import { of } from 'rxjs';
 
 describe('App', () => {
   beforeEach(async () => {
-    const taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'updateTask']);
-    taskServiceSpy.getTasks.and.returnValue(of({ data: [], pages: 0, items: 0, first: 1, prev: null, next: null, last: 0 }));
-
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [
-        { provide: TaskService, useValue: taskServiceSpy }
-      ]
+      providers: [provideRouter([])]
     }).compileComponents();
   });
 

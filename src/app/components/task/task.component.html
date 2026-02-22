@@ -1,6 +1,8 @@
 <div class="task-card" [class.task-card--completed]="task().completed">
   <div class="task-card__header">
-    <h3 class="task-card__title">{{ task().title }}</h3>
+    <h3 class="task-card__title">
+      <a class="task-card__title-link" [routerLink]="['/tasks', task().id]">{{ task().title }}</a>
+    </h3>
     <span class="task-card__state-badge" [attr.data-state]="currentState()">
       {{ currentState() }}
     </span>

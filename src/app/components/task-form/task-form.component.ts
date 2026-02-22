@@ -1,5 +1,6 @@
-import { Component, inject, output, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { Task, TaskState } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 
@@ -12,9 +13,7 @@ import { TaskService } from '../../services/task.service';
 export class TaskFormComponent {
   private readonly fb = inject(FormBuilder);
   private readonly taskService = inject(TaskService);
-
-  taskCreated = output<Task>();
-  cancelled = output<void>();
+  private readonly router = inject(Router);
 
   states: TaskState[] = ['new', 'active', 'resolved', 'closed'];
   submitting = signal(false);
@@ -60,9 +59,9 @@ export class TaskFormComponent {
     };
 
     this.taskService.createTask(task).subscribe({
-      next: (created) => {
+      next: () => {
         this.submitting.set(false);
-        this.taskCreated.emit(created);
+        this.router.navigate(['/tasks']);
       },
       error: () => {
         this.submitting.set(false);
@@ -71,6 +70,6 @@ export class TaskFormComponent {
   }
 
   onCancel(): void {
-    this.cancelled.emit();
+    this.router.navigate(['/tasks']);
   }
 }

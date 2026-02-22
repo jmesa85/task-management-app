@@ -1,0 +1,108 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter, ActivatedRoute } from '@angular/router';
+import { TaskDetailComponent } from './task-detail.component';
+import { TaskService } from '../../services/task.service';
+import { Task } from '../../models/task.model';
+import { of } from 'rxjs';
+
+describe('TaskDetailComponent', () => {
+  let component: TaskDetailComponent;
+  let fixture: ComponentFixture<TaskDetailComponent>;
+  let taskServiceSpy: jasmine.SpyObj<TaskService>;
+
+  const mockTask: Task = {
+    id: '1',
+    title: 'Test Task',
+    description: 'A task for testing',
+    dueDate: '2024-01-15',
+    completed: false,
+    stateHistory: [
+      { state: 'new', date: '2024-01-01' },
+      { state: 'active', date: '2024-01-05' }
+    ],
+    notes: ['Note one', 'Note two']
+  };
+
+  beforeEach(async () => {
+    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTask']);
+    taskServiceSpy.getTask.and.returnValue(of(mockTask));
+
+    await TestBed.configureTestingModule({
+      imports: [TaskDetailComponent],
+      providers: [
+        { provide: TaskService, useValue: taskServiceSpy },
+        provideRouter([]),
+        {
+          provide: ActivatedRoute,
+          useValue: { snapshot: { paramMap: { get: () => '1' } } }
+        }
+      ]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(TaskDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should call getTask with id from route', () => {
+    expect(taskServiceSpy.getTask).toHaveBeenCalledWith('1');
+  });
+
+  it('should render the task title', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-detail__title')?.textContent).toContain('Test Task');
+  });
+
+  it('should render the task description', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-detail__description')?.textContent).toContain('A task for testing');
+  });
+
+  it('should render the current state badge', () => {
+    const badge = fixture.nativeElement.querySelector('.task-detail__state-badge');
+    expect(badge?.textContent?.trim()).toBe('active');
+    expect(badge?.getAttribute('data-state')).toBe('active');
+  });
+
+  it('should render state history entries', () => {
+    const historyItems = fixture.nativeElement.querySelectorAll('.task-detail__history-item');
+    expect(historyItems.length).toBe(2);
+  });
+
+  it('should render notes', () => {
+    const notes = fixture.nativeElement.querySelectorAll('.task-detail__notes-list li');
+    expect(notes.length).toBe(2);
+    expect(notes[0].textContent).toContain('Note one');
+    expect(notes[1].textContent).toContain('Note two');
+  });
+
+  it('should render back to list link', () => {
+    const backLink = fixture.nativeElement.querySelector('.task-detail__back') as HTMLAnchorElement;
+    expect(backLink).toBeTruthy();
+    expect(backLink.getAttribute('href')).toBe('/tasks');
+  });
+
+  it('should show loading state when task is null', () => {
+    component.task.set(null);
+    fixture.detectChanges();
+    const loading = fixture.nativeElement.querySelector('.task-detail--loading');
+    expect(loading).toBeTruthy();
+    expect(loading.textContent).toContain('Loading task...');
+  });
+
+  it('should render completed status', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-detail__completed')?.textContent).toContain('Incomplete');
+  });
+
+  it('should render "Completed" when task is completed', () => {
+    component.task.set({ ...mockTask, completed: true });
+    fixture.detectChanges();
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-detail__completed')?.textContent).toContain('Completed');
+  });
+});

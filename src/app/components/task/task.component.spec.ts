@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { TaskComponent } from './task.component';
 import { Task } from '../../models/task.model';
 
@@ -21,7 +22,8 @@ describe('TaskComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TaskComponent]
+      imports: [TaskComponent],
+      providers: [provideRouter([])]
     }).compileComponents();
 
     fixture = TestBed.createComponent(TaskComponent);
@@ -116,5 +118,11 @@ describe('TaskComponent', () => {
   it('should not apply completed class when task is not completed', () => {
     const card = fixture.nativeElement.querySelector('.task-card');
     expect(card.classList.contains('task-card--completed')).toBeFalse();
+  });
+
+  it('should render task title as a link to detail view', () => {
+    const titleLink = fixture.nativeElement.querySelector('.task-card__title-link') as HTMLAnchorElement;
+    expect(titleLink).toBeTruthy();
+    expect(titleLink.getAttribute('href')).toBe('/tasks/1');
   });
 });

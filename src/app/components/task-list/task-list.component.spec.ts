@@ -1,4 +1,5 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { TaskListComponent } from './task-list.component';
 import { TaskService, PaginatedResponse } from '../../services/task.service';
 import { Task } from '../../models/task.model';
@@ -57,7 +58,8 @@ describe('TaskListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [TaskListComponent],
       providers: [
-        { provide: TaskService, useValue: taskServiceSpy }
+        { provide: TaskService, useValue: taskServiceSpy },
+        provideRouter([])
       ]
     }).compileComponents();
 
@@ -199,5 +201,12 @@ describe('TaskListComponent', () => {
     expect(component.editingTaskId()).toBe('1');
     component.onStateFormCancelled();
     expect(component.editingTaskId()).toBeNull();
+  });
+
+  it('should render add task link with routerLink to /tasks/new', () => {
+    const addLink = fixture.nativeElement.querySelector('.task-list__add-btn') as HTMLAnchorElement;
+    expect(addLink).toBeTruthy();
+    expect(addLink.textContent).toContain('+ Add Task');
+    expect(addLink.getAttribute('href')).toBe('/tasks/new');
   });
 });
