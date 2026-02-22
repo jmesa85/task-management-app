@@ -18,7 +18,7 @@
       @if (editingTaskId() === task.id) {
         <app-task-state-form
           [task]="task"
-          (stateChanged)="onStateChanged($event)"
+          (stateChanged)="onStateChanged()"
           (cancelled)="onStateFormCancelled()"
         />
       }

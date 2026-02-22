@@ -1,14 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { TaskListComponent } from './task-list.component';
-import { TaskService, PaginatedResponse } from '../../services/task.service';
+import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 describe('TaskListComponent', () => {
   let component: TaskListComponent;
   let fixture: ComponentFixture<TaskListComponent>;
   let taskServiceSpy: jasmine.SpyObj<TaskService>;
+
+  let tasksSubject: BehaviorSubject<Task[]>;
+  let currentPageSubject: BehaviorSubject<number>;
+  let totalPagesSubject: BehaviorSubject<number>;
+  let totalItemsSubject: BehaviorSubject<number>;
 
   const mockTasks: Task[] = [
     {
@@ -31,29 +36,21 @@ describe('TaskListComponent', () => {
     }
   ];
 
-  const mockResponse: PaginatedResponse<Task> = {
-    data: mockTasks,
-    pages: 2,
-    items: 7,
-    first: 1,
-    prev: null,
-    next: 2,
-    last: 2
-  };
-
-  const singlePageResponse: PaginatedResponse<Task> = {
-    data: mockTasks,
-    pages: 1,
-    items: 2,
-    first: 1,
-    prev: null,
-    next: null,
-    last: 1
-  };
-
   beforeEach(async () => {
-    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTasks', 'createTask', 'updateTask']);
-    taskServiceSpy.getTasks.and.returnValue(of(mockResponse));
+    tasksSubject = new BehaviorSubject<Task[]>(mockTasks);
+    currentPageSubject = new BehaviorSubject<number>(1);
+    totalPagesSubject = new BehaviorSubject<number>(2);
+    totalItemsSubject = new BehaviorSubject<number>(7);
+
+    taskServiceSpy = jasmine.createSpyObj('TaskService',
+      ['loadTasks', 'nextPage', 'previousPage', 'goToPage', 'updateTask', 'createTask'],
+      {
+        tasks$: tasksSubject.asObservable(),
+        currentPage$: currentPageSubject.asObservable(),
+        totalPages$: totalPagesSubject.asObservable(),
+        totalItems$: totalItemsSubject.asObservable()
+      }
+    );
 
     await TestBed.configureTestingModule({
       imports: [TaskListComponent],
@@ -77,10 +74,6 @@ describe('TaskListComponent', () => {
     expect(taskCards.length).toBe(2);
   });
 
-  it('should call getTasks on init', () => {
-    expect(taskServiceSpy.getTasks).toHaveBeenCalledWith(1);
-  });
-
   it('should show pagination controls when multiple pages', () => {
     const pagination = fixture.nativeElement.querySelector('.task-list__pagination');
     expect(pagination).toBeTruthy();
@@ -88,8 +81,7 @@ describe('TaskListComponent', () => {
   });
 
   it('should hide pagination controls when single page', () => {
-    taskServiceSpy.getTasks.and.returnValue(of(singlePageResponse));
-    component.ngOnInit();
+    totalPagesSubject.next(1);
     fixture.detectChanges();
     const pagination = fixture.nativeElement.querySelector('.task-list__pagination');
     expect(pagination).toBeNull();
@@ -106,26 +98,28 @@ describe('TaskListComponent', () => {
   });
 
   it('should disable Next button on last page', () => {
-    const lastPageResponse: PaginatedResponse<Task> = {
-      ...mockResponse,
-      pages: 2,
-      prev: 1,
-      next: null
-    };
-    taskServiceSpy.getTasks.and.returnValue(of(lastPageResponse));
-    component.goToPage(2);
+    currentPageSubject.next(2);
     fixture.detectChanges();
     const nextBtn = fixture.nativeElement.querySelector('.task-list__pagination-btn:last-child') as HTMLButtonElement;
     expect(nextBtn.disabled).toBeTrue();
   });
 
-  it('should call getTasks with next page on nextPage()', () => {
-    taskServiceSpy.getTasks.calls.reset();
+  it('should call service nextPage on nextPage()', () => {
     component.nextPage();
-    expect(taskServiceSpy.getTasks).toHaveBeenCalledWith(2);
+    expect(taskServiceSpy.nextPage).toHaveBeenCalled();
   });
 
-  it('should call service and update local state on onToggleComplete', () => {
+  it('should call service previousPage on previousPage()', () => {
+    component.previousPage();
+    expect(taskServiceSpy.previousPage).toHaveBeenCalled();
+  });
+
+  it('should call service goToPage on goToPage()', () => {
+    component.goToPage(3);
+    expect(taskServiceSpy.goToPage).toHaveBeenCalledWith(3);
+  });
+
+  it('should call service updateTask on onToggleComplete', () => {
     const task = mockTasks[0];
     const updatedTask = { ...task, completed: true };
     taskServiceSpy.updateTask.and.returnValue(of(updatedTask));
@@ -133,21 +127,10 @@ describe('TaskListComponent', () => {
     component.onToggleComplete(task);
 
     expect(taskServiceSpy.updateTask).toHaveBeenCalledWith(updatedTask);
-    expect(component.tasks().find(t => t.id === '1')?.completed).toBeTrue();
   });
 
   it('should show empty state when no tasks', () => {
-    const emptyResponse: PaginatedResponse<Task> = {
-      data: [],
-      pages: 0,
-      items: 0,
-      first: 1,
-      prev: null,
-      next: null,
-      last: 0
-    };
-    taskServiceSpy.getTasks.and.returnValue(of(emptyResponse));
-    component.ngOnInit();
+    tasksSubject.next([]);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.task-list__empty')?.textContent).toContain('No tasks found.');
   });
@@ -183,17 +166,10 @@ describe('TaskListComponent', () => {
     expect(stateForm).toBeNull();
   });
 
-  it('should clear editingTaskId and update task on onStateChanged', () => {
+  it('should clear editingTaskId on onStateChanged', () => {
     component.onEdit(mockTasks[0]);
-    const updatedTask: Task = {
-      ...mockTasks[0],
-      stateHistory: [...mockTasks[0].stateHistory, { state: 'resolved', date: '2024-01-10' }]
-    };
-
-    component.onStateChanged(updatedTask);
-
+    component.onStateChanged();
     expect(component.editingTaskId()).toBeNull();
-    expect(component.tasks().find(t => t.id === '1')?.stateHistory.length).toBe(2);
   });
 
   it('should clear editingTaskId on onStateFormCancelled', () => {
@@ -208,5 +184,13 @@ describe('TaskListComponent', () => {
     expect(addLink).toBeTruthy();
     expect(addLink.textContent).toContain('+ Add Task');
     expect(addLink.getAttribute('href')).toBe('/tasks/new');
+  });
+
+  it('should update view when tasks$ emits new data', () => {
+    const newTasks: Task[] = [mockTasks[0]];
+    tasksSubject.next(newTasks);
+    fixture.detectChanges();
+    const taskCards = fixture.nativeElement.querySelectorAll('app-task');
+    expect(taskCards.length).toBe(1);
   });
 });

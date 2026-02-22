@@ -3,12 +3,13 @@ import { provideRouter, ActivatedRoute } from '@angular/router';
 import { TaskDetailComponent } from './task-detail.component';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
-import { of } from 'rxjs';
+import { BehaviorSubject, of } from 'rxjs';
 
 describe('TaskDetailComponent', () => {
   let component: TaskDetailComponent;
   let fixture: ComponentFixture<TaskDetailComponent>;
   let taskServiceSpy: jasmine.SpyObj<TaskService>;
+  let selectedTaskSubject: BehaviorSubject<Task | null>;
 
   const mockTask: Task = {
     id: '1',
@@ -24,8 +25,15 @@ describe('TaskDetailComponent', () => {
   };
 
   beforeEach(async () => {
-    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTask']);
-    taskServiceSpy.getTask.and.returnValue(of(mockTask));
+    selectedTaskSubject = new BehaviorSubject<Task | null>(null);
+
+    taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTask'], {
+      selectedTask$: selectedTaskSubject.asObservable()
+    });
+    taskServiceSpy.getTask.and.callFake(() => {
+      selectedTaskSubject.next(mockTask);
+      return of(mockTask);
+    });
 
     await TestBed.configureTestingModule({
       imports: [TaskDetailComponent],
@@ -87,7 +95,7 @@ describe('TaskDetailComponent', () => {
   });
 
   it('should show loading state when task is null', () => {
-    component.task.set(null);
+    selectedTaskSubject.next(null);
     fixture.detectChanges();
     const loading = fixture.nativeElement.querySelector('.task-detail--loading');
     expect(loading).toBeTruthy();
@@ -100,7 +108,7 @@ describe('TaskDetailComponent', () => {
   });
 
   it('should render "Completed" when task is completed', () => {
-    component.task.set({ ...mockTask, completed: true });
+    selectedTaskSubject.next({ ...mockTask, completed: true });
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.task-detail__completed')?.textContent).toContain('Completed');

@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { Task } from '../../models/task.model';
@@ -14,7 +15,7 @@ export class TaskDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly taskService = inject(TaskService);
 
-  task = signal<Task | null>(null);
+  task = toSignal(this.taskService.selectedTask$, { initialValue: null as Task | null });
 
   currentState = computed(() => {
     const t = this.task();
@@ -25,8 +26,6 @@ export class TaskDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id')!;
-    this.taskService.getTask(id).subscribe((task) => {
-      this.task.set(task);
-    });
+    this.taskService.getTask(id).subscribe();
   }
 }
