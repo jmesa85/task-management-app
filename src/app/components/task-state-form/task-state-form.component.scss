@@ -1,0 +1,115 @@
+.task-state-form {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.25rem;
+  background: #fff;
+  margin-top: 0.5rem;
+
+  &__title {
+    margin: 0 0 1rem;
+    font-size: 1.125rem;
+  }
+
+  &__history {
+    margin-bottom: 1rem;
+  }
+
+  &__history-label {
+    display: block;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__history-entry {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__state-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.25rem 0.625rem;
+    border-radius: 1rem;
+    color: #fff;
+
+    &[data-state='new'] {
+      background-color: #3b82f6;
+    }
+    &[data-state='active'] {
+      background-color: #f59e0b;
+    }
+    &[data-state='resolved'] {
+      background-color: #10b981;
+    }
+    &[data-state='closed'] {
+      background-color: #6b7280;
+    }
+  }
+
+  &__history-date {
+    font-size: 0.875rem;
+    color: #555;
+  }
+
+  &__field {
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  &__input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  &__btn {
+    padding: 0.375rem 0.875rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: opacity 0.2s;
+
+    &:hover:not(:disabled) {
+      opacity: 0.85;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    &--submit {
+      background-color: #10b981;
+      color: #fff;
+    }
+
+    &--cancel {
+      background-color: #6b7280;
+      color: #fff;
+    }
+  }
+}

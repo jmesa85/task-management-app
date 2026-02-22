@@ -1,12 +1,13 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { TaskComponent } from '../task/task.component';
 import { TaskFormComponent } from '../task-form/task-form.component';
+import { TaskStateFormComponent } from '../task-state-form/task-state-form.component';
 import { Task } from '../../models/task.model';
 import { TaskService } from '../../services/task.service';
 
 @Component({
   selector: 'app-task-list',
-  imports: [TaskComponent, TaskFormComponent],
+  imports: [TaskComponent, TaskFormComponent, TaskStateFormComponent],
   templateUrl: './task-list.component.html',
   styleUrl: './task-list.component.scss'
 })
@@ -15,6 +16,7 @@ export class TaskListComponent implements OnInit {
 
   tasks = signal<Task[]>([]);
   showForm = signal(false);
+  editingTaskId = signal<string | null>(null);
   currentPage = signal(1);
   totalPages = signal(0);
   totalItems = signal(0);
@@ -76,7 +78,18 @@ export class TaskListComponent implements OnInit {
   }
 
   onEdit(task: Task): void {
-    console.log('Edit task:', task);
+    this.editingTaskId.update((id) => (id === task.id ? null : task.id!));
+  }
+
+  onStateChanged(task: Task): void {
+    this.editingTaskId.set(null);
+    this.tasks.update((tasks) =>
+      tasks.map((t) => (t.id === task.id ? task : t))
+    );
+  }
+
+  onStateFormCancelled(): void {
+    this.editingTaskId.set(null);
   }
 
   onDelete(task: Task): void {

@@ -21,6 +21,13 @@
         (edit)="onEdit($event)"
         (delete)="onDelete($event)"
       />
+      @if (editingTaskId() === task.id) {
+        <app-task-state-form
+          [task]="task"
+          (stateChanged)="onStateChanged($event)"
+          (cancelled)="onStateFormCancelled()"
+        />
+      }
     }
   </div>
 

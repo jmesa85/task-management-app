@@ -149,4 +149,55 @@ describe('TaskListComponent', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.task-list__empty')?.textContent).toContain('No tasks found.');
   });
+
+  it('should set editingTaskId on onEdit', () => {
+    component.onEdit(mockTasks[0]);
+    expect(component.editingTaskId()).toBe('1');
+  });
+
+  it('should toggle editingTaskId to null when editing same task', () => {
+    component.onEdit(mockTasks[0]);
+    expect(component.editingTaskId()).toBe('1');
+    component.onEdit(mockTasks[0]);
+    expect(component.editingTaskId()).toBeNull();
+  });
+
+  it('should switch editingTaskId when editing a different task', () => {
+    component.onEdit(mockTasks[0]);
+    expect(component.editingTaskId()).toBe('1');
+    component.onEdit(mockTasks[1]);
+    expect(component.editingTaskId()).toBe('2');
+  });
+
+  it('should render state form when editingTaskId matches', () => {
+    component.onEdit(mockTasks[0]);
+    fixture.detectChanges();
+    const stateForm = fixture.nativeElement.querySelector('app-task-state-form');
+    expect(stateForm).toBeTruthy();
+  });
+
+  it('should not render state form when editingTaskId does not match', () => {
+    const stateForm = fixture.nativeElement.querySelector('app-task-state-form');
+    expect(stateForm).toBeNull();
+  });
+
+  it('should clear editingTaskId and update task on onStateChanged', () => {
+    component.onEdit(mockTasks[0]);
+    const updatedTask: Task = {
+      ...mockTasks[0],
+      stateHistory: [...mockTasks[0].stateHistory, { state: 'resolved', date: '2024-01-10' }]
+    };
+
+    component.onStateChanged(updatedTask);
+
+    expect(component.editingTaskId()).toBeNull();
+    expect(component.tasks().find(t => t.id === '1')?.stateHistory.length).toBe(2);
+  });
+
+  it('should clear editingTaskId on onStateFormCancelled', () => {
+    component.onEdit(mockTasks[0]);
+    expect(component.editingTaskId()).toBe('1');
+    component.onStateFormCancelled();
+    expect(component.editingTaskId()).toBeNull();
+  });
 });

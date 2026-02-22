@@ -1,0 +1,37 @@
+<form class="task-state-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <h3 class="task-state-form__title">Change State: {{ task().title }}</h3>
+
+  @if (task().stateHistory.length > 0) {
+    <div class="task-state-form__history">
+      <strong class="task-state-form__history-label">State History:</strong>
+      <div class="task-state-form__history-list">
+        @for (entry of task().stateHistory; track $index) {
+          <div class="task-state-form__history-entry">
+            <span class="task-state-form__state-badge" [attr.data-state]="entry.state">
+              {{ entry.state }}
+            </span>
+            <span class="task-state-form__history-date">{{ entry.date | date:'mediumDate' }}</span>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <div class="task-state-form__field">
+    <label class="task-state-form__label" for="state">New State</label>
+    <select class="task-state-form__input" id="state" formControlName="state">
+      @for (state of states; track state) {
+        <option [value]="state">{{ state }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="task-state-form__actions">
+    <button type="submit" class="task-state-form__btn task-state-form__btn--submit" [disabled]="submitting()">
+      Update State
+    </button>
+    <button type="button" class="task-state-form__btn task-state-form__btn--cancel" (click)="onCancel()">
+      Cancel
+    </button>
+  </div>
+</form>
