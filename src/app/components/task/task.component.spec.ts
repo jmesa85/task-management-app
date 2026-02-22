@@ -1,0 +1,89 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TaskComponent } from './task.component';
+import { Task } from '../../models/task.model';
+
+describe('TaskComponent', () => {
+  let component: TaskComponent;
+  let fixture: ComponentFixture<TaskComponent>;
+
+  const mockTask: Task = {
+    id: 1,
+    title: 'Test Task',
+    description: 'A task for testing',
+    dueDate: '2024-01-15',
+    completed: false,
+    stateHistory: [
+      { state: 'new', date: '2024-01-01' },
+      { state: 'active', date: '2024-01-05' }
+    ],
+    notes: ['Note one', 'Note two']
+  };
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [TaskComponent]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(TaskComponent);
+    component = fixture.componentInstance;
+    fixture.componentRef.setInput('task', mockTask);
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should render the task title', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-card__title')?.textContent).toContain('Test Task');
+  });
+
+  it('should render the task description', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.querySelector('.task-card__description')?.textContent).toContain('A task for testing');
+  });
+
+  it('should render the current state badge', () => {
+    const badge = fixture.nativeElement.querySelector('.task-card__state-badge');
+    expect(badge?.textContent?.trim()).toBe('active');
+    expect(badge?.getAttribute('data-state')).toBe('active');
+  });
+
+  it('should compute currentState from the last stateHistory entry', () => {
+    expect(component.currentState()).toBe('active');
+  });
+
+  it('should default currentState to "new" when stateHistory is empty', () => {
+    fixture.componentRef.setInput('task', { ...mockTask, stateHistory: [] });
+    fixture.detectChanges();
+    expect(component.currentState()).toBe('new');
+  });
+
+  it('should render notes when present', () => {
+    const notes = fixture.nativeElement.querySelectorAll('.task-card__notes-list li');
+    expect(notes.length).toBe(2);
+    expect(notes[0].textContent).toContain('Note one');
+    expect(notes[1].textContent).toContain('Note two');
+  });
+
+  it('should hide notes section when notes array is empty', () => {
+    fixture.componentRef.setInput('task', { ...mockTask, notes: [] });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('.task-card__notes')).toBeNull();
+  });
+
+  it('should emit task on edit button click', () => {
+    spyOn(component.edit, 'emit');
+    const btn = fixture.nativeElement.querySelector('.task-card__btn--edit') as HTMLButtonElement;
+    btn.click();
+    expect(component.edit.emit).toHaveBeenCalledWith(mockTask);
+  });
+
+  it('should emit task on delete button click', () => {
+    spyOn(component.delete, 'emit');
+    const btn = fixture.nativeElement.querySelector('.task-card__btn--delete') as HTMLButtonElement;
+    btn.click();
+    expect(component.delete.emit).toHaveBeenCalledWith(mockTask);
+  });
+});

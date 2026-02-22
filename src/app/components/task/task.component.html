@@ -1,0 +1,30 @@
+<div class="task-card">
+  <div class="task-card__header">
+    <h3 class="task-card__title">{{ task().title }}</h3>
+    <span class="task-card__state-badge" [attr.data-state]="currentState()">
+      {{ currentState() }}
+    </span>
+  </div>
+
+  <p class="task-card__description">{{ task().description }}</p>
+
+  <p class="task-card__due-date">
+    <strong>Due:</strong> {{ task().dueDate | date:'mediumDate' }}
+  </p>
+
+  @if (task().notes.length > 0) {
+    <div class="task-card__notes">
+      <strong>Notes:</strong>
+      <ul class="task-card__notes-list">
+        @for (note of task().notes; track note) {
+          <li>{{ note }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <div class="task-card__actions">
+    <button class="task-card__btn task-card__btn--edit" (click)="edit.emit(task())">Edit</button>
+    <button class="task-card__btn task-card__btn--delete" (click)="delete.emit(task())">Delete</button>
+  </div>
+</div>
