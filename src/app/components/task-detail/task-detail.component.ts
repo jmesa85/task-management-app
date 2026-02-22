@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, Signal, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -16,6 +16,7 @@ export class TaskDetailComponent implements OnInit {
   private readonly taskService = inject(TaskService);
 
   task = toSignal(this.taskService.selectedTask$, { initialValue: null as Task | null });
+  error: Signal<string | null> = toSignal(this.taskService.error$, { initialValue: null });
 
   currentState = computed(() => {
     const t = this.task();

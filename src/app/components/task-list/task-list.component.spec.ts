@@ -3,7 +3,7 @@ import { provideRouter } from '@angular/router';
 import { TaskListComponent } from './task-list.component';
 import { TaskService } from '../../services/task.service';
 import { Task } from '../../models/task.model';
-import { BehaviorSubject, of } from 'rxjs';
+import { BehaviorSubject, of, throwError } from 'rxjs';
 
 describe('TaskListComponent', () => {
   let component: TaskListComponent;
@@ -14,6 +14,7 @@ describe('TaskListComponent', () => {
   let currentPageSubject: BehaviorSubject<number>;
   let totalPagesSubject: BehaviorSubject<number>;
   let totalItemsSubject: BehaviorSubject<number>;
+  let errorSubject: BehaviorSubject<string | null>;
 
   const mockTasks: Task[] = [
     {
@@ -41,6 +42,7 @@ describe('TaskListComponent', () => {
     currentPageSubject = new BehaviorSubject<number>(1);
     totalPagesSubject = new BehaviorSubject<number>(2);
     totalItemsSubject = new BehaviorSubject<number>(7);
+    errorSubject = new BehaviorSubject<string | null>(null);
 
     taskServiceSpy = jasmine.createSpyObj('TaskService',
       ['loadTasks', 'nextPage', 'previousPage', 'goToPage', 'updateTask', 'createTask'],
@@ -48,7 +50,8 @@ describe('TaskListComponent', () => {
         tasks$: tasksSubject.asObservable(),
         currentPage$: currentPageSubject.asObservable(),
         totalPages$: totalPagesSubject.asObservable(),
-        totalItems$: totalItemsSubject.asObservable()
+        totalItems$: totalItemsSubject.asObservable(),
+        error$: errorSubject.asObservable()
       }
     );
 
@@ -192,5 +195,30 @@ describe('TaskListComponent', () => {
     fixture.detectChanges();
     const taskCards = fixture.nativeElement.querySelectorAll('app-task');
     expect(taskCards.length).toBe(1);
+  });
+
+  it('should render error banner when error$ emits', () => {
+    errorSubject.next('Failed to load tasks. Please try again later.');
+    fixture.detectChanges();
+    const errorBanner = fixture.nativeElement.querySelector('.task-list__error');
+    expect(errorBanner).toBeTruthy();
+    expect(errorBanner.textContent).toContain('Failed to load tasks');
+    expect(errorBanner.getAttribute('role')).toBe('alert');
+  });
+
+  it('should not render error banner when error$ is null', () => {
+    errorSubject.next(null);
+    fixture.detectChanges();
+    const errorBanner = fixture.nativeElement.querySelector('.task-list__error');
+    expect(errorBanner).toBeNull();
+  });
+
+  it('should show toggle error when updateTask fails', () => {
+    taskServiceSpy.updateTask.and.returnValue(throwError(() => new Error('fail')));
+    component.onToggleComplete(mockTasks[0]);
+    fixture.detectChanges();
+    const errorBanner = fixture.nativeElement.querySelector('.task-list__error');
+    expect(errorBanner).toBeTruthy();
+    expect(errorBanner.textContent).toContain('Failed to update task');
   });
 });

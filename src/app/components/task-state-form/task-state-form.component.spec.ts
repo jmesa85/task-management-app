@@ -111,4 +111,33 @@ describe('TaskStateFormComponent', () => {
     component.onSubmit();
     expect(component.submitting()).toBeFalse();
   });
+
+  it('should display error message when updateTask fails', () => {
+    taskServiceSpy.updateTask.and.returnValue(throwError(() => new Error('fail')));
+    component.form.patchValue({ state: 'resolved' });
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const errorBanner = fixture.nativeElement.querySelector('.task-state-form__error');
+    expect(errorBanner).toBeTruthy();
+    expect(errorBanner.textContent).toContain('Failed to update state');
+    expect(errorBanner.getAttribute('role')).toBe('alert');
+  });
+
+  it('should clear error message on resubmission', () => {
+    taskServiceSpy.updateTask.and.returnValue(throwError(() => new Error('fail')));
+    component.form.patchValue({ state: 'resolved' });
+    component.onSubmit();
+    expect(component.errorMessage()).toBe('Failed to update state. Please try again.');
+
+    // On resubmission, error should be cleared
+    const savedTask: Task = {
+      ...mockTask,
+      stateHistory: [...mockTask.stateHistory, { state: 'closed', date: '2024-01-10' }]
+    };
+    taskServiceSpy.updateTask.and.returnValue(of(savedTask));
+    component.form.patchValue({ state: 'closed' });
+    component.onSubmit();
+    expect(component.errorMessage()).toBeNull();
+  });
 });

@@ -1,6 +1,13 @@
 <div class="task-list">
   <h2 class="task-list__title">Tasks</h2>
 
+  @if (error()) {
+    <div class="task-list__error" role="alert">{{ error() }}</div>
+  }
+  @if (toggleError()) {
+    <div class="task-list__error" role="alert">{{ toggleError() }}</div>
+  }
+
   <a class="task-list__add-btn" routerLink="/tasks/new">+ Add Task</a>
 
   @if (tasks().length === 0) {

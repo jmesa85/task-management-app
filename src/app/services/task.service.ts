@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { DestroyRef, Injectable, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { BehaviorSubject, Observable, Subject, merge } from 'rxjs';
-import { distinctUntilChanged, map, shareReplay, switchMap, tap } from 'rxjs/operators';
+import { BehaviorSubject, EMPTY, Observable, Subject, merge } from 'rxjs';
+import { catchError, distinctUntilChanged, map, shareReplay, switchMap, tap } from 'rxjs/operators';
 import { Task } from '../models/task.model';
 
 export interface PaginatedResponse<T> {
@@ -42,7 +42,9 @@ export class TaskService {
   private readonly tasksResponseSubject = new BehaviorSubject<PaginatedResponse<Task>>(EMPTY_RESPONSE);
   private readonly selectedTaskSubject = new BehaviorSubject<Task | null>(null);
   private readonly refreshTrigger$ = new Subject<void>();
+  private readonly errorSubject = new BehaviorSubject<string | null>(null);
 
+  readonly error$ = this.errorSubject.asObservable();
   readonly tasks$ = this.tasksResponseSubject.pipe(map(r => r.data));
   readonly currentPage$ = this.paginationParams$.pipe(map(p => p.page), distinctUntilChanged());
   readonly totalPages$ = this.tasksResponseSubject.pipe(map(r => r.pages), distinctUntilChanged());
@@ -57,9 +59,15 @@ export class TaskService {
       this.refreshTrigger$
     ).pipe(
       switchMap(() => {
+        this.errorSubject.next(null);
         const params = this.paginationParams$.value;
         return this.http.get<PaginatedResponse<Task>>(
           `${this.apiUrl}?_page=${params.page}&_per_page=${params.perPage}`
+        ).pipe(
+          catchError(() => {
+            this.errorSubject.next('Failed to load tasks. Please try again later.');
+            return EMPTY;
+          })
         );
       }),
       tap(response => this.tasksResponseSubject.next(response)),
@@ -96,8 +104,13 @@ export class TaskService {
   }
 
   getTask(id: string): Observable<Task> {
+    this.errorSubject.next(null);
     return this.http.get<Task>(`${this.apiUrl}/${id}`).pipe(
       tap(task => this.selectedTaskSubject.next(task)),
+      catchError(() => {
+        this.errorSubject.next('Failed to load task. Please try again later.');
+        return EMPTY;
+      }),
       shareReplay(1)
     );
   }

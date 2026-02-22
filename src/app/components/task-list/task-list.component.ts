@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, Signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { TaskComponent } from '../task/task.component';
@@ -20,6 +20,8 @@ export class TaskListComponent {
   totalPages = toSignal(this.taskService.totalPages$, { initialValue: 0 });
   totalItems = toSignal(this.taskService.totalItems$, { initialValue: 0 });
 
+  error: Signal<string | null> = toSignal(this.taskService.error$, { initialValue: null });
+  toggleError = signal<string | null>(null);
   editingTaskId = signal<string | null>(null);
 
   hasPreviousPage = computed(() => this.currentPage() > 1);
@@ -42,8 +44,13 @@ export class TaskListComponent {
   }
 
   onToggleComplete(task: Task): void {
+    this.toggleError.set(null);
     const updatedTask = { ...task, completed: !task.completed };
-    this.taskService.updateTask(updatedTask).subscribe();
+    this.taskService.updateTask(updatedTask).subscribe({
+      error: () => {
+        this.toggleError.set('Failed to update task. Please try again.');
+      }
+    });
   }
 
   onEdit(task: Task): void {

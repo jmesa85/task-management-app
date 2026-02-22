@@ -17,6 +17,7 @@ export class TaskFormComponent {
 
   states: TaskState[] = ['new', 'active', 'resolved', 'closed'];
   submitting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   form: FormGroup = this.fb.group({
     title: ['', Validators.required],
@@ -47,6 +48,7 @@ export class TaskFormComponent {
     }
 
     this.submitting.set(true);
+    this.errorMessage.set(null);
     const formValue = this.form.getRawValue();
 
     const task: Task = {
@@ -65,6 +67,7 @@ export class TaskFormComponent {
       },
       error: () => {
         this.submitting.set(false);
+        this.errorMessage.set('Failed to create task. Please try again.');
       }
     });
   }

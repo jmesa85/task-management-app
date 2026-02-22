@@ -10,6 +10,16 @@
     font-size: 1.125rem;
   }
 
+  &__error {
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
   &__history {
     margin-bottom: 1rem;
   }

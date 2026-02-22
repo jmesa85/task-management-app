@@ -3,6 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { TaskService, PaginatedResponse } from './task.service';
 import { Task } from '../models/task.model';
+import { firstValueFrom } from 'rxjs';
 
 describe('TaskService', () => {
   let service: TaskService;
@@ -226,5 +227,62 @@ describe('TaskService', () => {
 
     const updateReq = httpTesting.expectOne('http://localhost:3000/tasks/1');
     updateReq.flush(updatedTask);
+  });
+
+  it('should set error$ when constructor pipeline HTTP request fails', async () => {
+    const req = httpTesting.expectOne('http://localhost:3000/tasks?_page=1&_per_page=5');
+    req.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+
+    const error = await firstValueFrom(service.error$);
+    expect(error).toBe('Failed to load tasks. Please try again later.');
+  });
+
+  it('should survive HTTP error and respond to subsequent pagination', async () => {
+    // First request fails
+    const req1 = httpTesting.expectOne('http://localhost:3000/tasks?_page=1&_per_page=5');
+    req1.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+
+    let error = await firstValueFrom(service.error$);
+    expect(error).toBe('Failed to load tasks. Please try again later.');
+
+    // Stream should still be alive — trigger a retry via goToPage
+    service.goToPage(2);
+    const req2 = httpTesting.expectOne('http://localhost:3000/tasks?_page=2&_per_page=5');
+    req2.flush(mockResponse);
+
+    error = await firstValueFrom(service.error$);
+    expect(error).toBeNull();
+
+    const tasks = await firstValueFrom(service.tasks$);
+    expect(tasks.length).toBe(2);
+  });
+
+  it('should set error$ when getTask fails', async () => {
+    const req1 = httpTesting.expectOne('http://localhost:3000/tasks?_page=1&_per_page=5');
+    req1.flush(mockResponse);
+
+    service.getTask('999').subscribe();
+    const getReq = httpTesting.expectOne('http://localhost:3000/tasks/999');
+    getReq.flush('Not Found', { status: 404, statusText: 'Not Found' });
+
+    const error = await firstValueFrom(service.error$);
+    expect(error).toBe('Failed to load task. Please try again later.');
+  });
+
+  it('should clear error$ on successful fetch after failure', async () => {
+    // Fail first
+    const req1 = httpTesting.expectOne('http://localhost:3000/tasks?_page=1&_per_page=5');
+    req1.flush('Server Error', { status: 500, statusText: 'Internal Server Error' });
+
+    let error = await firstValueFrom(service.error$);
+    expect(error).toBe('Failed to load tasks. Please try again later.');
+
+    // Navigate to a different page to trigger a new request (distinctUntilChanged skips same values)
+    service.goToPage(2);
+    const req2 = httpTesting.expectOne('http://localhost:3000/tasks?_page=2&_per_page=5');
+    req2.flush(mockResponse);
+
+    error = await firstValueFrom(service.error$);
+    expect(error).toBeNull();
   });
 });

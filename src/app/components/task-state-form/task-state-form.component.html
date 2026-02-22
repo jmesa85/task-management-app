@@ -1,6 +1,10 @@
 <form class="task-state-form" [formGroup]="form" (ngSubmit)="onSubmit()">
   <h3 class="task-state-form__title">Change State: {{ task().title }}</h3>
 
+  @if (errorMessage()) {
+    <div class="task-state-form__error" role="alert">{{ errorMessage() }}</div>
+  }
+
   @if (task().stateHistory.length > 0) {
     <div class="task-state-form__history">
       <strong class="task-state-form__history-label">State History:</strong>

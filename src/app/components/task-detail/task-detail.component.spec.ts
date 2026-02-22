@@ -10,6 +10,7 @@ describe('TaskDetailComponent', () => {
   let fixture: ComponentFixture<TaskDetailComponent>;
   let taskServiceSpy: jasmine.SpyObj<TaskService>;
   let selectedTaskSubject: BehaviorSubject<Task | null>;
+  let errorSubject: BehaviorSubject<string | null>;
 
   const mockTask: Task = {
     id: '1',
@@ -26,9 +27,11 @@ describe('TaskDetailComponent', () => {
 
   beforeEach(async () => {
     selectedTaskSubject = new BehaviorSubject<Task | null>(null);
+    errorSubject = new BehaviorSubject<string | null>(null);
 
     taskServiceSpy = jasmine.createSpyObj('TaskService', ['getTask'], {
-      selectedTask$: selectedTaskSubject.asObservable()
+      selectedTask$: selectedTaskSubject.asObservable(),
+      error$: errorSubject.asObservable()
     });
     taskServiceSpy.getTask.and.callFake(() => {
       selectedTaskSubject.next(mockTask);
@@ -112,5 +115,19 @@ describe('TaskDetailComponent', () => {
     fixture.detectChanges();
     const el: HTMLElement = fixture.nativeElement;
     expect(el.querySelector('.task-detail__completed')?.textContent).toContain('Completed');
+  });
+
+  it('should render error state instead of loading when error$ has value', () => {
+    selectedTaskSubject.next(null);
+    errorSubject.next('Failed to load task. Please try again later.');
+    fixture.detectChanges();
+
+    const errorEl = fixture.nativeElement.querySelector('.task-detail__error');
+    expect(errorEl).toBeTruthy();
+    expect(errorEl.textContent).toContain('Failed to load task');
+    expect(errorEl.getAttribute('role')).toBe('alert');
+
+    const loading = fixture.nativeElement.querySelector('.task-detail--loading');
+    expect(loading).toBeNull();
   });
 });

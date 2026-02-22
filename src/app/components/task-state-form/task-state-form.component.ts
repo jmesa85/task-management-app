@@ -20,6 +20,7 @@ export class TaskStateFormComponent implements OnInit {
 
   states: TaskState[] = ['new', 'active', 'resolved', 'closed'];
   submitting = signal(false);
+  errorMessage = signal<string | null>(null);
 
   currentState = computed(() => {
     const history = this.task().stateHistory;
@@ -40,6 +41,7 @@ export class TaskStateFormComponent implements OnInit {
     }
 
     this.submitting.set(true);
+    this.errorMessage.set(null);
 
     const newEntry = {
       state: this.form.value.state as TaskState,
@@ -58,6 +60,7 @@ export class TaskStateFormComponent implements OnInit {
       },
       error: () => {
         this.submitting.set(false);
+        this.errorMessage.set('Failed to update state. Please try again.');
       }
     });
   }

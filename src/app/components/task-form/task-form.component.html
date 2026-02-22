@@ -1,4 +1,8 @@
 <form class="task-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  @if (errorMessage()) {
+    <div class="task-form__submit-error" role="alert">{{ errorMessage() }}</div>
+  }
+
   <div class="task-form__field">
     <label class="task-form__label" for="title">Title</label>
     <input class="task-form__input" id="title" type="text" formControlName="title" />

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { TaskFormComponent } from './task-form.component';
 import { TaskService } from '../../services/task.service';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Task } from '../../models/task.model';
 
 describe('TaskFormComponent', () => {
@@ -115,5 +115,43 @@ describe('TaskFormComponent', () => {
     fixture.detectChanges();
     const submitBtn = fixture.nativeElement.querySelector('.task-form__btn--submit') as HTMLButtonElement;
     expect(submitBtn.disabled).toBeTrue();
+  });
+
+  it('should display error message when createTask fails', () => {
+    taskServiceSpy.createTask.and.returnValue(throwError(() => new Error('fail')));
+
+    component.form.patchValue({
+      title: 'New Task',
+      description: 'A description',
+      dueDate: '2024-06-01',
+      state: 'new'
+    });
+    component.notes.at(0).setValue('First note');
+    component.onSubmit();
+    fixture.detectChanges();
+
+    const errorBanner = fixture.nativeElement.querySelector('.task-form__submit-error');
+    expect(errorBanner).toBeTruthy();
+    expect(errorBanner.textContent).toContain('Failed to create task');
+    expect(errorBanner.getAttribute('role')).toBe('alert');
+  });
+
+  it('should clear error message on resubmission', () => {
+    taskServiceSpy.createTask.and.returnValue(throwError(() => new Error('fail')));
+
+    component.form.patchValue({
+      title: 'New Task',
+      description: 'A description',
+      dueDate: '2024-06-01',
+      state: 'new'
+    });
+    component.notes.at(0).setValue('First note');
+    component.onSubmit();
+    expect(component.errorMessage()).toBe('Failed to create task. Please try again.');
+
+    // On resubmission, error should be cleared before the request
+    taskServiceSpy.createTask.and.returnValue(of(mockCreatedTask));
+    component.onSubmit();
+    expect(component.errorMessage()).toBeNull();
   });
 });

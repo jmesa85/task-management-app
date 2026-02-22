@@ -44,6 +44,11 @@
       </div>
     }
   </div>
+} @else if (error()) {
+  <div class="task-detail task-detail--error">
+    <a class="task-detail__back" routerLink="/tasks">&larr; Back to list</a>
+    <div class="task-detail__error" role="alert">{{ error() }}</div>
+  </div>
 } @else {
   <div class="task-detail task-detail--loading">
     <p>Loading task...</p>

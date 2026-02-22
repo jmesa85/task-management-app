@@ -5,6 +5,16 @@
   background: #fff;
   margin-bottom: 1rem;
 
+  &__submit-error {
+    background-color: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #b91c1c;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
   &__field {
     margin-bottom: 1rem;
   }
